@@ -378,6 +378,30 @@ int sys_repaint(int xpos, int ypos, char x) {
 			*p = x;
 		}
 	}
-	
 	return 0;
+}
+
+int sys_get_message(int *msg)
+{
+	if(msg_queue_tail == msg_queue_head)
+	{
+		put_fs_long(-1,msg);
+		return -1;
+	}
+	int message_ret = msg_queue[msg_queue_head].index;
+	msg_queue[msg_queue_head].index = 0;
+	msg_queue_head = (msg_queue_head + 1) % MAX_MSG;
+	put_fs_long(message_ret, msg);
+	return 0;
+}
+
+void post_message(int from) {
+	if (msg_queue_head - 1 != msg_queue_tail) {
+		message msg;
+		msg.index = from;
+		msg.pid = current->pid;
+		msg_queue[msg_queue_tail] = msg;
+		msg_queue_tail = (msg_queue_tail + 1) % MAX_MSG;
+	}
+	return;
 }

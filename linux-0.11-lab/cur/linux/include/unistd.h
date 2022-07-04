@@ -55,8 +55,10 @@
 #include <sys/utsname.h>
 #include <utime.h>
 
-#define MESSAGE_MOUSE 1
-#define MESSAGE_TIME  2
+#define MESSAGE_MOUSE 	1
+#define MESSAGE_TIME  	2
+#define MAX_MSG			1024
+unsigned int msg_queue_head, msg_queue_tail;
 
 typedef struct {
     long jiffies;
@@ -66,6 +68,11 @@ typedef struct {
     struct tch_timer *next;
 } tch_timer;
 tch_timer *timer_head, *timer_tail;
+
+typedef struct{
+	int index, pid;
+}message;
+message msg_queue[MAX_MSG];
 
 extern void post_message(int type);
 
@@ -160,6 +167,8 @@ extern void post_message(int type);
 #define __NR_uselib	86
 #define __NR_init_graphics 87
 #define __NR_repaint 88
+#define __NR_timer_create 89
+#define __NR_get_message 90
 #define _syscall0(type,name) \
 type name(void) \
 { \
@@ -279,6 +288,8 @@ int dup2(int oldfd, int newfd);
 int getppid(void);
 int init_graphics(void);
 int repaint(int xpos, int ypos, char c);
+int timer_create(int millseconds, int type);
+int get_message(int *msg);
 pid_t getpgrp(void);
 pid_t setsid(void);
 
