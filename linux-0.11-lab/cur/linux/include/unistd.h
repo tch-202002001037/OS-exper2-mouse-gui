@@ -56,6 +56,18 @@
 #include <utime.h>
 
 #define MESSAGE_MOUSE 1
+#define MESSAGE_TIME  2
+
+typedef struct {
+    long jiffies;
+    int type;
+    long init_jiffies;
+    int pid;
+    struct tch_timer *next;
+} tch_timer;
+tch_timer *timer_head, *timer_tail;
+
+extern void post_message(int type);
 
 #ifdef __LIBRARY__
 
@@ -146,6 +158,8 @@
 #define __NR_lstat	84
 #define __NR_readlink	85
 #define __NR_uselib	86
+#define __NR_init_graphics 87
+#define __NR_repaint 88
 #define _syscall0(type,name) \
 type name(void) \
 { \
@@ -263,6 +277,8 @@ pid_t wait(int * wait_stat);
 int write(int fildes, const char * buf, off_t count);
 int dup2(int oldfd, int newfd);
 int getppid(void);
+int init_graphics(void);
+int repaint(int xpos, int ypos, char c);
 pid_t getpgrp(void);
 pid_t setsid(void);
 

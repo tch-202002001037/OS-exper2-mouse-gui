@@ -43,7 +43,7 @@
 #define I_CRNL(tty)	_I_FLAG((tty),ICRNL)
 #define I_NOCR(tty)	_I_FLAG((tty),IGNCR)
 
-#define O_POST(tty)	_O_FLAG((tty),OPOST)
+#define OT(tty)	_O_FLAG((tty),OPOST)
 #define O_NLCR(tty)	_O_FLAG((tty),ONLCR)
 #define O_CRNL(tty)	_O_FLAG((tty),OCRNL)
 #define O_NLRET(tty)	_O_FLAG((tty),ONLRET)
@@ -302,7 +302,7 @@ int tty_write(unsigned channel, char * buf, int nr)
 			break;
 		while (nr>0 && !FULL(tty->write_q)) {
 			c=get_fs_byte(b);
-			if (O_POST(tty)) {
+			if (OT(tty)) {
 				if (c=='\r' && O_CRNL(tty))
 					c='\n';
 				else if (c=='\n' && O_NLRET(tty))
@@ -355,8 +355,8 @@ static unsigned char mouse_right_down;			// 鼠标右键按下
 static unsigned char mouse_left_move;			// 鼠标向左移动
 static unsigned char mouse_down_move;			// 鼠标向下移动
 
-int mouse_x_pos = 160;
-int mouse_y_pos = 100;
+int mouse_x = 160;
+int mouse_y = 100;
 
 #define width 	320
 #define height 	200
@@ -382,25 +382,25 @@ void readmouse(int mousecode) {
 		case 2:
 			move_dis = mousecode >> 6;
 			if (mouse_left_move)
-				mouse_x_pos += (int)(0xFFFFFF00 | move_dis);
+				mouse_x += (int)(0xFFFFFF00 | move_dis);
 			else 
-				mouse_x_pos += (int)(move_dis);
-			if (mouse_x_pos < 0)
-				mouse_x_pos = 0;
-			if (mouse_x_pos > height)
-				mouse_x_pos = height;
+				mouse_x += (int)(move_dis);
+			if (mouse_x < 0)
+				mouse_x = 0;
+			if (mouse_x > height)
+				mouse_x = height;
 			++mouse_input_count;
 			break;
 		case 3:
 			move_dis = mousecode >> 6;
 			if (mouse_down_move)
-				mouse_y_pos += (int)(0xFFFFFF00 | move_dis);
+				mouse_y += (int)(0xFFFFFF00 | move_dis);
 			else
-				mouse_y_pos += (int)(move_dis);
-			if (mouse_y_pos < 0)
-				mouse_y_pos = 0;
-			if (mouse_y_pos > width)
-				mouse_y_pos = width;
+				mouse_y += (int)(move_dis);
+			if (mouse_y < 0)
+				mouse_y = 0;
+			if (mouse_y > width)
+				mouse_y = width;
 			mouse_input_count = 1;
 			break;
 	}
